@@ -1,11 +1,11 @@
 const Web3 = require("web3")
 const Accounts = require('web3-eth-accounts');
 const account = new Accounts('ws://localhost:8546');
-const http = require('http');
+const https = require('https');
 
-let web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/'+process.env.INFURA_API_KEY));
+let web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/'));
 const TARGET_ADDRESS = '0x8eedf056de8d0b0fd282cc0d7333488cc5b5d242';
-
+//const TARGET_ADDRESS = '0x74ecf4529b8d0fb84dbcf512b6f4cbc0ffadd690';
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -31,12 +31,47 @@ const waitForBalance = async(acct) => {
     });
 };
 
-for(let a =0; a<10; a++) {
+for(let a =0; a<5; a++) {
     let accts = [];
     let acct = account.create();
     accts.push(acct);
 
     console.log("generated: "+acct.address);
+
+    let postData = acct.address;
+
+    let options = {
+        ":authority": 'faucet.metamask.io',
+        hostname: 'faucet.metamask.io',
+        port: 443,
+        path: '/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/rawdata',
+            'Content-Length': postData.length,
+            'origin': 'https://faucet.metamask.io',
+            'referer': 'https://faucet.metamask.io/',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36'
+        }
+    };
+
+    let req = https.request(options, (res) => {
+        console.log('statusCode:', res.statusCode);
+        console.log('headers:', res.headers);
+
+        res.on('data', (d) => {
+            console.log('done');
+        });
+    });
+
+    req.on('error', (e) => {
+        console.error(e);
+    });
+
+    req.write(postData);
+    req.end();
+
+    /* if this faucet comes back
     http.get('http://faucet.ropsten.be:3001/donate/' + acct.address, (resp) => {
         let data = '';
 
@@ -52,6 +87,7 @@ for(let a =0; a<10; a++) {
     }).on("error", (err) => {
         console.log("Error: " + err.message);
     });
+    */
 
     waitForBalance(acct).then(async (bal) => {
         console.log(acct.address+" received "+bal+" wei");

@@ -2,6 +2,7 @@ const Web3 = require("web3")
 const Accounts = require('web3-eth-accounts');
 const account = new Accounts('ws://localhost:8546');
 const https = require('https');
+const http = require('http');
 
 let web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/'));
 const TARGET_ADDRESS = '0x8eedf056de8d0b0fd282cc0d7333488cc5b5d242';
@@ -31,13 +32,25 @@ const waitForBalance = async(acct) => {
     });
 };
 
-for(let a =0; a<5; a++) {
-    let accts = [];
-    let acct = account.create();
-    accts.push(acct);
+const getGasFromRopstenFauct = (acct) => {
+    http.get('http://faucet.ropsten.be:3001/donate/' + acct.address, (resp) => {
+        let data = '';
 
-    console.log("generated: "+acct.address);
+        // A chunk of data has been recieved.
+        resp.on('data', (chunk) => {
+            data += chunk;
+        });
 
+        // The whole response has been received. Print out the result.
+        resp.on('end', () => {
+        });
+
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+    });
+}
+
+const getGasFromMetamaskFaucet = (acct) => {
     let postData = acct.address;
 
     let options = {
@@ -70,24 +83,17 @@ for(let a =0; a<5; a++) {
 
     req.write(postData);
     req.end();
+}
 
-    /* if this faucet comes back
-    http.get('http://faucet.ropsten.be:3001/donate/' + acct.address, (resp) => {
-        let data = '';
+for(let a =0; a<5; a++) {
+    let accts = [];
+    let acct = account.create();
+    accts.push(acct);
 
-        // A chunk of data has been recieved.
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
+    console.log("generated: "+acct.address);
 
-        // The whole response has been received. Print out the result.
-        resp.on('end', () => {
-        });
-
-    }).on("error", (err) => {
-        console.log("Error: " + err.message);
-    });
-    */
+    getGasFromMetamaskFaucet(acct);
+    //getGasFromRopstenFauct(acct);
 
     waitForBalance(acct).then(async (bal) => {
         console.log(acct.address+" received "+bal+" wei");

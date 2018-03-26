@@ -85,7 +85,7 @@ const getGasFromMetamaskFaucet = (acct) => {
     req.end();
 }
 
-for(let a =0; a<5; a++) {
+for(let a =0; a<20; a++) {
     let accts = [];
     let acct = account.create();
     accts.push(acct);

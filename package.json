@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.223.1",
     "ethereumjs-tx": "^1.3.3",
     "ethereumjs-util": "^5.1.3",
     "firebase-admin": "^5.11.0",

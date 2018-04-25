@@ -1,5 +1,5 @@
 const NUMBER_OF_VOTES = 20;
-const TARGET_ADDRESS = '0xa71cfeb932ec407304032600f91c796394465bb9';
+const TARGET_ADDRESS = '0xb055de68519c500eb4855dfa928cec037f30e7d5';
 
 const Web3 = require("web3")
 const Accounts = require('web3-eth-accounts');
@@ -51,7 +51,3 @@ const sendVotes = async(max) => {
 };
 
 sendVotes(NUMBER_OF_VOTES);
-
-
-
-
